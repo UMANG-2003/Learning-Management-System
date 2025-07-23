@@ -24,7 +24,9 @@
     "react-dom": "^19.1.0",
     "react-router-dom": "^7.6.3",
     "react-simple-star-rating": "^5.1.7",
+    "react-slick": "^0.30.3",
     "react-youtube": "^10.1.0",
+    "slick-carousel": "^1.8.1",
     "tailwindcss": "^4.1.11",
     "uniqid": "^5.4.0"
   },
