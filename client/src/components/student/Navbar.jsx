@@ -3,11 +3,14 @@ import { Link } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUser } from "@fortawesome/free-solid-svg-icons";
 import { useClerk, UserButton, useUser } from "@clerk/clerk-react";
+import { AppContext } from "../../context/AppContext";
 
 const Navbar = () => {
   const isCourseListPage = window.location.pathname.includes("/course-list");
   const { user } = useUser();
   const { signOut, openSignIn } = useClerk();
+  const { isEducator, setIsEducator } = React.useContext(AppContext);
+  const {navigate} = React.useContext(AppContext);
   return (
     <nav
       className="flex justify-between items-center  px-2  sm:px-4 md:px-14 lg:px-36 py-3 border-b-2 border-gray-800 shadow-2xl shadow-gray-100 bg-gray-950  
@@ -22,8 +25,9 @@ const Navbar = () => {
         <div className="flex items-center gap-5">
           {user && (
             <>
-              {" "}
-              <button>Become Educator</button>
+              <button onClick={() => navigate("/educator")}>
+                {isEducator ? "Dashboard" : "Become Educator"}
+              </button>
               <div>|</div>
               <Link to="/my-enrollments">My Enrollments</Link>
             </>
@@ -46,7 +50,9 @@ const Navbar = () => {
         <div className="flex items-center gap-1 sm:gap-4">
           {user && (
             <>
-              <button className="max-md:text-xs ">Become Educator</button>
+             <button className="max-md:text-xs " onClick={() => navigate("/educator")}>
+                {isEducator ? "Dashboard" : "Become Educator"}
+              </button>
               <div>|</div>
               <Link className="max-md:text-xs " to="/my-enrollments">
                 My Enrollments
