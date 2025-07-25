@@ -101,29 +101,29 @@ export const dummyEducatorData = {
     "__v": 0
 }
 
-// export const dummyTestimonial = [
-//     {
-//         name: 'Donald Jackman',
-//         role: 'SWE 1 @ Amazon',
-//         image: assets.profile_img_1,
-//         rating: 5,
-//         feedback: 'I\'ve been using Imagify for nearly two years, primarily for Instagram, and it has been incredibly user-friendly, making my work much easier.',
-//     },
-//     {
-//         name: 'Richard Nelson',
-//         role: 'SWE 2 @ Samsung',
-//         image: assets.profile_img_2,
-//         rating: 4,
-//         feedback: 'I\'ve been using Imagify for nearly two years, primarily for Instagram, and it has been incredibly user-friendly, making my work much easier.',
-//     },
-//     {
-//         name: 'James Washington',
-//         role: 'SWE 2 @ Google',
-//         image: assets.profile_img_3,
-//         rating: 4.5,
-//         feedback: 'I\'ve been using Imagify for nearly two years, primarily for Instagram, and it has been incredibly user-friendly, making my work much easier.',
-//     },
-// ];
+export const dummyTestimonial = [
+    {
+        name: 'Donald Jackman',
+        role: 'SWE 1 @ Amazon',
+        image: "https://media.istockphoto.com/id/1437816897/photo/business-woman-manager-or-human-resources-portrait-for-career-success-company-we-are-hiring.jpg?s=612x612&w=0&k=20&c=tyLvtzutRh22j9GqSGI33Z4HpIwv9vL_MZw_xOE19NQ=",
+        rating: 5,
+        feedback: 'I\'ve been using Imagify for nearly two years, primarily for Instagram, and it has been incredibly user-friendly, making my work much easier.',
+    },
+    {
+        name: 'Richard Nelson',
+        role: 'SWE 2 @ Samsung',
+        image: "https://plus.unsplash.com/premium_photo-1689568126014-06fea9d5d341?fm=jpg&q=60&w=3000&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8cHJvZmlsZXxlbnwwfHwwfHx8MA%3D%3D",
+        rating: 4,
+        feedback: 'I\'ve been using Imagify for nearly two years, primarily for Instagram, and it has been incredibly user-friendly, making my work much easier.',
+    },
+    {
+        name: 'James Washington',
+        role: 'SWE 2 @ Google',
+        image: "https://media.istockphoto.com/id/1309328823/photo/headshot-portrait-of-smiling-male-employee-in-office.jpg?s=612x612&w=0&k=20&c=kPvoBm6qCYzQXMAn9JUtqLREXe9-PlZyMl9i-ibaVuY=",
+        rating: 4.5,
+        feedback: 'I\'ve been using Imagify for nearly two years, primarily for Instagram, and it has been incredibly user-friendly, making my work much easier.',
+    },
+];
 
 export const dummyDashboardData = {
     "totalEarnings": 707.38,
