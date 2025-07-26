@@ -19,7 +19,7 @@ function CoursesSection() {
       </div>
 
       <Link
-        to="/courses-list"
+        to="/course-list"
         className="inline-block mt-4 text-blue-500 hover:underline border-2 border-gray-900 px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors"
       >
         View All Courses
