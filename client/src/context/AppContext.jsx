@@ -13,9 +13,19 @@ export const AppContextProvider = (props) => {
     setallCourses(dummyCourses);
   };
 
-  useEffect(() => {
-    fetchCourses();
-  }, []);
+  const humanizeDuration = (duration, options) => {
+    const ms = duration % 1000;
+    const seconds = Math.floor((duration / 1000) % 60);
+    const minutes = Math.floor((duration / (1000 * 60)) % 60);
+    const hours = Math.floor((duration / (1000 * 60 * 60)) % 24);
+    
+    let result = '';
+    if (hours > 0) result += `${hours}h `;
+    if (minutes > 0) result += `${minutes}m `;
+    if (seconds > 0) result += `${seconds}s`;
+    
+    return result.trim();
+  };
 
   const calculateRating = (course) => {
     if (course.courseRatings.length === 0) {
@@ -27,6 +37,40 @@ export const AppContextProvider = (props) => {
     });
     return total / course.courseRatings.length;
   };
+ 
+  const calculateChapterTime=(chapter)=>{
+   let time=0;
+   chapter.chapterContent.map((lecture)=>{
+     time+=lecture.lectureDuration;
+   })
+   return humanizeDuration(time*60*1000,{units:["h","m"]});
+  }
+
+
+  const calculateCourseDuration=(course)=>{
+   let time=0;
+   course.courseContent.map((chapter)=>{
+    chapter.chapterContent.map((lecture)=>{
+     time+=lecture.lectureDuration;
+    })
+   })
+   return humanizeDuration(time*60*1000,{units:["h","m"]});
+  }
+ 
+  const calculateNoOfLectures=(course)=>{
+   let totalLectures=0;
+    course.courseContent.forEach((chapter)=>{
+      if(Array.isArray(chapter.chapterContent)){
+        totalLectures+=chapter.chapterContent.length;
+      }
+    })
+    return totalLectures;
+  }
+
+  useEffect(() => {
+    fetchCourses();
+  }, []);
+
 
   const value = {
     currency,
@@ -35,6 +79,10 @@ export const AppContextProvider = (props) => {
     isEducator,
     setIsEducator,
     navigate,
+    calculateChapterTime,
+    calculateCourseDuration,  
+    calculateNoOfLectures,
+    humanizeDuration
   };
 
   return (
