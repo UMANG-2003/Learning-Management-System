@@ -2,6 +2,7 @@ import React, { useContext, useState } from "react";
 import { AppContext } from "../../context/AppContext";
 import {Line} from "rc-progress";
 import Footer from '../../components/student/Footer'
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 function MyEnrollments() {
   const { enrolledCourses, calculateCourseDuration,navigate} = useContext(AppContext);
