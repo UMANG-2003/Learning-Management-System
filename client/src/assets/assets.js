@@ -176,43 +176,44 @@ export const dummyDashboardData = {
 
     export const dummyStudentEnrolled = 
     [
-        {
-            "student": {
-                "_id": "user_2qQlvXyr02B4Bq6hT0Gvaa5fT9V",
-                "name": "GreatStack",
-                "imageUrl": "/profile.png"
-            },
-            "courseTitle": "Introduction to JavaScript",
-            "purchaseDate": "2024-12-20T08:39:55.509Z"
-        },
-        {
-            "student": {
-                "_id": "user_2qQlvXyr02B4Bq6hT0Gvaa5fT9V",
-                "name": "GreatStack",
-                "imageUrl": "/profile.png"
-            },
-            "courseTitle": "Introduction to JavaScript",
-            "purchaseDate": "2024-12-20T08:59:49.964Z"
-        },
-        {
-            "student": {
-                "_id": "user_2qQlvXyr02B4Bq6hT0Gvaa5fT9V",
-                "name": "GreatStack",
-                "imageUrl": "/profile.png"
-            },
-            "courseTitle": "Advanced Python Programming",
-            "purchaseDate": "2024-12-20T11:03:42.931Z"
-        },
-        {
-            "student": {
-                "_id": "user_2qQlvXyr02B4Bq6hT0Gvaa5fT9V",
-                "name": "GreatStack",
-                "imageUrl": "/profile.png"
-            },
-            "courseTitle": "Web Development Bootcamp",
-            "purchaseDate": "2024-12-20T11:04:48.798Z"
-        }
-    ]
+  {
+    "student": {
+      "_id": "user_2qQlvXyr02B4Bq6hT0Gvaa5fT9V",
+      "name": "Aarav Sharma",
+      "imageUrl": "/profile.png"
+    },
+    "courseTitle": "Introduction to JavaScript",
+    "purchaseDate": "2024-12-20T08:39:55.509Z"
+  },
+  {
+    "student": {
+      "_id": "user_2qQlvXyr02B4Bq6hT0Gvaa5fT9V",
+      "name": "Sophia Patel",
+      "imageUrl": "/profile.png"
+    },
+    "courseTitle": "Introduction to JavaScript",
+    "purchaseDate": "2024-12-20T08:59:49.964Z"
+  },
+  {
+    "student": {
+      "_id": "user_2qQlvXyr02B4Bq6hT0Gvaa5fT9V",
+      "name": "Ethan Williams",
+      "imageUrl": "/profile.png"
+    },
+    "courseTitle": "Advanced Python Programming",
+    "purchaseDate": "2024-12-20T11:03:42.931Z"
+  },
+  {
+    "student": {
+      "_id": "user_2qQlvXyr02B4Bq6hT0Gvaa5fT9V",
+      "name": "Isabella Johnson",
+      "imageUrl": "/profile.png"
+    },
+    "courseTitle": "Web Development Bootcamp",
+    "purchaseDate": "2024-12-20T11:04:48.798Z"
+  }
+]
+
 
 export const dummyCourses = [
     {
