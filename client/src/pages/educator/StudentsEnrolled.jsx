@@ -1,36 +1,43 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { dummyStudentEnrolled } from "../../assets/assets";
 import Loading from "../../components/student/Loading";
 import { AppContext } from "../../context/AppContext";
 import axios from "axios";
+import { toast } from "react-toastify";
 
 function StudentsEnrolled() {
   const [enrolledStudents, setEnrolledStudents] = useState(null);
-  const {backendUrl,getToken,isEducator}=useContext(AppContext);
+  const { backendUrl, getToken, isEducator } = useContext(AppContext);
 
- const fetchEnrolledStudents = async () => {
-  try {
-    const token = await getToken()
-    const { data } = await axios.get(backendUrl + '/api/educator/enrolled-students', { headers: { Authorization: `Bearer ${token}` } })
-    if (data.success){
-      setEnrolledStudents(data.enrolledStudents.reverse())
-    } else {
-      toast.error(data.message)
+  const fetchEnrolledStudents = async () => {
+    try {
+      const token = await getToken();
+      const { data } = await axios.get(
+        backendUrl + "/api/educator/enrolled-students",
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      if (data.success) {
+        setEnrolledStudents([...data.enrolledStudents].reverse()); // ✅ safer reverse
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      toast.error(error.message);
     }
-
-  } catch (error) {
-    toast.error(error.message)
-  }
-}
-
+  };
 
   useEffect(() => {
-    if(isEducator){
-     fetchEnrolledStudents();
+    if (isEducator) {
+      fetchEnrolledStudents();
     }
   }, [isEducator]);
 
-  return enrolledStudents ? (
+  if (enrolledStudents === null) {
+    return <Loading />;
+  }
+
+  return (
     <div className="min-h-screen w-full flex flex-col items-center p-4 md:p-8">
       <div className="w-full max-w-4xl overflow-x-auto bg-white rounded-xl shadow-sm border border-gray-200">
         <table className="min-w-full text-sm text-gray-700">
@@ -43,27 +50,43 @@ function StudentsEnrolled() {
             </tr>
           </thead>
           <tbody>
-            {enrolledStudents.map((item, index) => (
-              <tr
-                key={index}
-                className="border-t border-gray-100 hover:bg-gray-50 transition"
-              >
-                <td className="px-3 py-2 text-center hidden sm:table-cell font-medium text-gray-500">
-                  {index + 1}
-                </td>
-                <td className="px-3 py-4 font-medium flex gap-1 items-center"><img src={item.student.imageUrl} className="w-8 rounded-full" alt="" />{item.student.name}</td>
-                <td className="px-3 py-4">{item.courseTitle}</td>
-                <td className="px-3 py-4 hidden sm:table-cell text-gray-500">
-                  {new Date(item.purchaseDate).toLocaleDateString()}
+            {enrolledStudents.length > 0 ? (
+              enrolledStudents.map((item, index) => (
+                <tr
+                  key={index}
+                  className="border-t border-gray-100 hover:bg-gray-50 transition"
+                >
+                  <td className="px-3 py-2 text-center hidden sm:table-cell font-medium text-gray-500">
+                    {index + 1}
+                  </td>
+                  <td className="px-3 py-4 font-medium flex gap-1 items-center">
+                    <img
+                      src={item.student.imageUrl || dummyStudentEnrolled}
+                      className="w-8 h-8 rounded-full object-cover"
+                      alt=""
+                    />
+                    {item.student.name}
+                  </td>
+                  <td className="px-3 py-4">{item.courseTitle}</td>
+                  <td className="px-3 py-4 hidden sm:table-cell text-gray-500">
+                    {new Date(item.purchaseDate).toLocaleDateString()}
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td
+                  colSpan="4"
+                  className="px-4 py-6 text-center text-gray-400"
+                >
+                  No students enrolled yet
                 </td>
               </tr>
-            ))}
+            )}
           </tbody>
         </table>
       </div>
     </div>
-  ) : (
-    <Loading />
   );
 }
 

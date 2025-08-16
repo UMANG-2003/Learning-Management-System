@@ -34,6 +34,11 @@ export const purchaseCourse = async (req, res) => {
     const { courseId } = req.body;
     const { origin } = req.headers;
     const userId = req.auth.userId;
+
+    if (!courseId) {
+      return res.json({ success: false, message: "Course ID is required" });
+    }
+
     const userData = await User.findById(userId);
     const courseData = await Course.findById(courseId);
 
@@ -41,45 +46,62 @@ export const purchaseCourse = async (req, res) => {
       return res.json({ success: false, message: "Data Not Found" });
     }
 
-    const purchaseData = {
-      courseId: courseData._id,
-      userId,
-      amount: (
+    if (userData.enrolledCourses.includes(courseId)) {
+      return res.json({ success: false, message: "Already Enrolled" });
+    }
+
+    const amount = Number(
+      (
         courseData.coursePrice -
         (courseData.discount * courseData.coursePrice) / 100
-      ).toFixed(2),
-    };
+      ).toFixed(2)
+    );
 
-    const newPurchase = await Purchase.create(purchaseData);
+    // Create purchase record in DB
+    const newPurchase = await Purchase.create({
+      courseId: courseData._id,
+      userId,
+      amount,
+      status: "pending",
+    });
+
+    // Stripe setup
     const stripeInstance = new Stripe(process.env.STRIPE_SECRET_KEY);
-    const currency = process.env.CURRENCY.toLowerCase();
-    const line_items = [
-      {
-        price_data: {
-          currency,
-          product_data: {
-            name: courseData.courseTitle,
-          },
-          unit_amount: Math.floor(newPurchase.amount) * 100,
-        },
-        quantity: 1,
-      },
-    ];
+    const currency = process.env.CURRENCY?.toLowerCase() || "usd";
+
     const session = await stripeInstance.checkout.sessions.create({
-      success_url: `${origin}/loading/my-enrollments`,
-      cancel_url: `${origin}/`,
-      line_items: line_items,
+      payment_method_types: ["card"],
+      line_items: [
+        {
+          price_data: {
+            currency,
+            product_data: {
+              name: courseData.courseTitle,
+              description: courseData.courseDescription || "Course purchase",
+            },
+            unit_amount: Math.round(amount * 100), // amount in cents
+          },
+          quantity: 1,
+        },
+      ],
       mode: "payment",
+      success_url: `${origin}/payment-success?purchaseId=${newPurchase._id}`,
+      cancel_url: `${origin}/payment-failed?purchaseId=${newPurchase._id}`,
       metadata: {
+        userId,
+        courseId: courseData._id.toString(),
         purchaseId: newPurchase._id.toString(),
       },
     });
 
-    res.json({ success: true, session_url: session.url });
+    return res.json({ success: true, sessionId: session.id, url: session.url });
   } catch (error) {
-    res.json({ success: false, message: error.message });
+    console.error("Error in purchaseCourse:", error);
+    return res.status(500).json({ success: false, message: "Server Error" });
   }
 };
+
+
 
 export const updateUserCourseProgress = async (req, res) => {
   try {

@@ -2,10 +2,11 @@ import React, { useContext, useEffect, useState } from "react";
 import { AppContext } from "../../context/AppContext";
 import Loading from "../../components/student/Loading";
 import axios from "axios";
+import { toast } from "react-toastify";
 
 function MyCourse() {
   const { currency, backendUrl, isEducator, getToken } = useContext(AppContext);
-  const [courses, setCourses] = useState(null);
+  const [courses, setCourses] = useState([]); // ✅ Start with empty array
   const [loading, setLoading] = useState(true);
 
   const fetchEducatorCourses = async () => {
@@ -15,22 +16,26 @@ function MyCourse() {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      data.success && setCourses(data.courses);
+      if (data.success) {
+        setCourses(data.courses);
+      }
     } catch (error) {
       toast.error(error.message);
+    } finally {
+      setLoading(false); 
     }
   };
 
   useEffect(() => {
-    if(isEducator){
-    fetchEducatorCourses();
+    if (isEducator) {
+      fetchEducatorCourses();
+    } else {
+      setLoading(false); // ✅ Avoid infinite loading if not educator
     }
   }, [isEducator]);
 
   if (loading) {
-    return (
-     <Loading />
-    );
+    return <Loading />;
   }
 
   return (
@@ -52,38 +57,39 @@ function MyCourse() {
               </tr>
             </thead>
             <tbody>
-              {courses.map((course) => (
-                <tr
-                  key={course._id}
-                  className="border-t border-gray-200 hover:bg-gray-50 transition-colors"
-                >
-                  <td className="px-4 py-3 truncate">
-                    <span className="font-medium text-gray-900 flex gap-5">
-                      <img
-                        src={course.courseThumbnail}
-                        className="w-12 h-12 object-cover rounded-md"
-                        alt=""
-                      />{" "}
-                      {course.courseTitle}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3 text-gray-600">
-                    {currency}{" "}
-                    {Math.floor(
-                      course.enrolledStudents.length *
-                        (course.coursePrice -
-                          (course.discount * course.coursePrice) / 100)
-                    ).toLocaleString()}
-                  </td>
-                  <td className="px-4 py-3">
-                    {course.enrolledStudents.length}
-                  </td>
-                  <td className="px-4 py-3">
-                    {new Date(course.createdAt).toLocaleDateString()}
-                  </td>
-                </tr>
-              ))}
-              {courses.length === 0 && (
+              {courses.length > 0 ? (
+                courses.map((course) => (
+                  <tr
+                    key={course._id}
+                    className="border-t border-gray-200 hover:bg-gray-50 transition-colors"
+                  >
+                    <td className="px-4 py-3 truncate">
+                      <span className="font-medium text-gray-900 flex gap-5">
+                        <img
+                          src={course.courseThumbnail}
+                          className="w-12 h-12 object-cover rounded-md"
+                          alt=""
+                        />
+                        {course.courseTitle}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 text-gray-600">
+                      {currency}{" "}
+                      {Math.floor(
+                        course.enrolledStudents.length *
+                          (course.coursePrice -
+                            (course.discount * course.coursePrice) / 100)
+                      ).toLocaleString()}
+                    </td>
+                    <td className="px-4 py-3">
+                      {course.enrolledStudents.length}
+                    </td>
+                    <td className="px-4 py-3">
+                      {new Date(course.createdAt).toLocaleDateString()}
+                    </td>
+                  </tr>
+                ))
+              ) : (
                 <tr>
                   <td
                     colSpan="4"

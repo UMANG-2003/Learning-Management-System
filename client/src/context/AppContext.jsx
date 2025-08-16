@@ -19,17 +19,20 @@ export const AppContextProvider = (props) => {
   const { user } = useUser();
 
   const fetchAllCourses = async () => {
-    try {
-      await axios.get(backendUrl + "/api/course/all");
-      if (data.success) {
-        setallCourses(data.course);
-      } else {
-        toast.error(data.message);
-      }
-    } catch (error) {
-      toast.error(error.message);
+  try {
+    const { data } = await axios.get(backendUrl + "/api/course/all");
+
+    if (data.success) {
+      setallCourses(data.courses);
+    } else {
+      toast.error(data.message);
     }
-  };
+  } catch (error) {
+    toast.error(error.message);
+  }
+};
+
+
 
   const fetchUserData = async () => {
     if (user.publicMetadata.role === "educator") {
@@ -128,7 +131,7 @@ export const AppContextProvider = (props) => {
   useEffect(() => {
     if (user) {
       fetchUserData();
-       fetchUserEnrolledCourses();
+      fetchUserEnrolledCourses();
     }
   }, [user]);
 

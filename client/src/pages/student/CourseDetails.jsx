@@ -11,7 +11,8 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import Footer from "../../components/student/Footer";
 import YouTube from "react-youtube";
-
+import { toast } from "react-toastify";
+import axios from "axios";
 function CourseDetails() {
   const { id } = useParams();
   const { allcourses } = useContext(AppContext);
@@ -36,7 +37,7 @@ function CourseDetails() {
       const { data } = await axios.get(`${backendUrl}/api/course/` + id);
 
       if (data.success) {
-        setCourseData(data.course);
+        setCourseData(data.courseData);
       } else {
         toast.error(data.message);
       }
@@ -50,9 +51,15 @@ function CourseDetails() {
       if (!userData) {
         return toast.warn("Login to Enroll");
       }
+      if (!course) {
+        return toast.error("Course not loaded yet");
+      }
       if (isAlreadyEnrolled) {
         return toast.warn("Already Enrolled");
       }
+
+      const token = getToken();
+
       const { data } = await axios.post(
         `${backendUrl}/api/user/purchase`,
         { courseId: course._id },
@@ -63,14 +70,14 @@ function CourseDetails() {
         }
       );
 
-      if (data.success) {
-        const { session_url } = data;
-        window.location.replace(session_url);
+      if (data.success && data.session_url) {
+        window.location.replace(data.session_url);
       } else {
-        toast.error(data.message);
+        toast.error(data.message || "Unable to start checkout session");
       }
     } catch (error) {
-      toast.error(error.message);
+      console.error(error);
+      toast.error("Something went wrong. Please try again.");
     }
   };
 
@@ -79,7 +86,7 @@ function CourseDetails() {
   }, []);
   useEffect(() => {
     if (userData && course) {
-      setIsAlreadyEnrolled(userData.enrolledCourses.includes(courseData._id));
+      setIsAlreadyEnrolled(userData.enrolledCourses.includes(course._id));
     }
   }, [userData, course]);
 
@@ -299,12 +306,18 @@ function CourseDetails() {
             </div>
 
             <div className="pt-4 sm:pt-6">
-              <button 
-                className="w-full py-2 sm:py-3 px-4 bg-blue-600 text-white rounded-lg font-semibold transition-colors duration-300 "
+              <button
+                className={`w-full py-2 sm:py-3 px-4 rounded-lg font-semibold transition-colors duration-300 ${
+                  isAlreadyEnrolled
+                    ? "bg-gray-600 cursor-not-allowed"
+                    : "bg-blue-600 hover:bg-blue-700"
+                }`}
                 onClick={enrolledCourses}
+                disabled={isAlreadyEnrolled}
               >
                 {isAlreadyEnrolled ? "Already Enrolled" : "Enroll Now"}
               </button>
+
               <button
                 className="w-full py-2 sm:py-3 px-4 bg-gray-700 text-white rounded-lg font-semibold mt-2 sm:mt-3 transition-colors duration-300 hover:bg-gray-600"
                 onClick={() => {}}
