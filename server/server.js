@@ -13,11 +13,17 @@ const app = express()
 await connectDB()
 await connectCloudinary()
 
+// ✅ CORS setup
 app.use(cors({
   origin: "https://lms-frontend-nu-seven.vercel.app",
-  methods: ["GET", "POST", "PUT", "DELETE"],
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
   credentials: true
 }))
+
+// ✅ Handle preflight requests globally
+app.options('*', cors())
+
 app.use(clerkMiddleware()) 
 
 app.get('/', (req, res) => {
@@ -27,9 +33,7 @@ app.get('/', (req, res) => {
 app.post('/clerk', express.json(), clerkWebhooks)
 
 app.use('/api/educator', express.json(), educatorRouter)
-
-app.use("/api/course", courseRoute);
-
+app.use("/api/course", express.json(), courseRoute)
 app.use('/api/user', express.json(), userRouter)
 
 app.post('/stripe', express.raw({ type: 'application/json' }), stripeWebhooks)
