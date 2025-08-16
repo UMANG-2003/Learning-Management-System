@@ -13,11 +13,11 @@ const app = express()
 await connectDB()
 await connectCloudinary()
 
-app.use(cors(
+app.use(cors({
   origin: "https://lms-frontend-nu-seven.vercel.app",
   methods: ["GET", "POST", "PUT", "DELETE"],
   credentials: true
-))
+}))
 app.use(clerkMiddleware()) 
 
 app.get('/', (req, res) => {
