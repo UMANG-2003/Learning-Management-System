@@ -1,21 +1,54 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { AppContext } from "../../context/AppContext";
 import {Line} from "rc-progress";
 import Footer from '../../components/student/Footer'
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 function MyEnrollments() {
-  const { enrolledCourses, calculateCourseDuration,navigate} = useContext(AppContext);
-  const [progressArray, setProgressArray] = useState([
-    { lecturesCompleted: 2, totalLectures: 4 },
-    { lecturesCompleted: 4, totalLectures: 5 },
-    { lecturesCompleted: 1, totalLectures: 6 },
-    { lecturesCompleted: 4, totalLectures: 4 },
-    { lecturesCompleted: 2, totalLectures: 3 },
-    { lecturesCompleted: 5, totalLectures: 6 },
-    { lecturesCompleted: 10, totalLectures: 10 },
-    { lecturesCompleted: 3, totalLectures: 7 },
-  ]);
+  const { enrolledCourses, calculateCourseDuration,navigate,userData,fetchUserEnrolledCourses , backendUrl,getToken,calculateNoOfLectures} = useContext(AppContext);
+  const [progressArray, setProgressArray] = useState([]);
+
+  const getCourseProgress = async () => {
+  try {
+    const token = await getToken();
+    const tempProgressArray = await Promise.all(
+      courses.map(async (course) => {
+        const { data } = await axios.post(
+          `${backendUrl}/api/user/get-course-progress`,
+          { courseId: course._id },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        const totalLectures = calculateNoOfLectures(course);
+        const lectureCompleted = data.progressData
+          ? data.progressData.length
+          : 0;
+
+        return { totalLectures, lectureCompleted };
+      })
+    );
+
+    setProgressArray(tempProgressArray);
+  } catch (error) {
+     toast.error(error.message)
+  }
+};
+
+ useEffect(()=>{
+   if(userData){
+    fetchUserEnrolledCourses()
+   }
+ },[userData])
+
+ useEffect(()=>{
+   if(enrolledCourses.length>0){
+    getCourseProgress()
+   }
+ },[enrolledCourses])
 
   return <>
     <div className="bg-black min-h-screen text-white px-4 md:px-36 py-20">

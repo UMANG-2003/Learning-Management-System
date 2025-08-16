@@ -4,13 +4,42 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUser } from "@fortawesome/free-solid-svg-icons";
 import { useClerk, UserButton, useUser } from "@clerk/clerk-react";
 import { AppContext } from "../../context/AppContext";
+import { toast } from "react-toastify";
+import axios from "axios";
 
 const Navbar = () => {
   const isCourseListPage = window.location.pathname.includes("/course-list");
   const { user } = useUser();
   const { signOut, openSignIn } = useClerk();
-  const { isEducator, setIsEducator } = React.useContext(AppContext);
-  const {navigate} = React.useContext(AppContext);
+  const { isEducator, setIsEducator, backendUrl, getToken } =
+    React.useContext(AppContext);
+  const { navigate } = React.useContext(AppContext);
+
+  const becomeEducator = async () => {
+    try {
+      if (isEducator) {
+        navigate("/educator");
+        return;
+      }
+      const token = await getToken();
+      const { data } = await axios.get(
+        backendUrl + "/api/educator/update-role",
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      if (data.success) {
+        setIsEducator(true);
+        toast.success(data.message);
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      toast.error(error.message)
+    }
+  };
+
   return (
     <nav
       className="flex justify-between items-center  px-2  sm:px-4 md:px-14 lg:px-36 py-3 border-b-2 border-gray-800 shadow-2xl shadow-gray-100 bg-gray-950  
@@ -20,13 +49,13 @@ const Navbar = () => {
         src="/logo.png"
         alt="Logo"
         className="w-28 lg:w-40 cursor-pointer rounded-4xl"
-        onClick={()=>navigate("/")}
+        onClick={() => navigate("/")}
       />
       <div className="hidden  md:flex items-center gap-5 text-gray-500">
         <div className="flex items-center gap-5">
           {user && (
             <>
-              <button onClick={() => navigate("/educator")}>
+              <button onClick={becomeEducator}>
                 {isEducator ? "Dashboard" : "Become Educator"}
               </button>
               <div>|</div>
@@ -51,7 +80,10 @@ const Navbar = () => {
         <div className="flex items-center gap-1 sm:gap-4">
           {user && (
             <>
-             <button className="max-md:text-xs " onClick={() => navigate("/educator")}>
+              <button
+                className="max-md:text-xs "
+                onClick={becomeEducator}
+              >
                 {isEducator ? "Dashboard" : "Become Educator"}
               </button>
               <div>|</div>

@@ -2,20 +2,39 @@ import React, { useContext, useEffect, useState } from "react";
 import { AppContext } from "../../context/AppContext";
 import { dummyDashboardData } from "../../assets/assets";
 import Loading from "../../components/student/Loading";
+import axios from "axios";
 import {
   faUser,
   faBook,
   faDollarSign,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { toast } from "react-toastify";
 
 function Dashboard() {
-  const { currency } = useContext(AppContext);
+  const { currency,backendUrl,getToken,isEducator } = useContext(AppContext);
   const [dashboardData, setDashboardData] = useState(null);
+  const fetchDashboardData = async () => {
+  try {
+    const token = await getToken()
+    const { data } = await axios.get(backendUrl + '/api/educator/dashboard', 
+      {headers: { Authorization: `Bearer ${token}` }})
+
+    if (data.success){
+      setDashboardData(data.dashboardData)
+    } else {
+      toast.error(data.message)
+    }
+  } catch (error) {
+    toast.error(data.message)
+  }
+}
 
   useEffect(() => {
-    setDashboardData(dummyDashboardData);
-  }, []);
+   if(isEducator){
+    fetchDashboardData();
+   }
+  }, [isEducator]);
 
   const stats = dashboardData
     ? [

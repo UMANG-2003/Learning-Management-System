@@ -1,24 +1,35 @@
 import React, { useContext, useEffect, useState } from "react";
 import { AppContext } from "../../context/AppContext";
 import Loading from "../../components/student/Loading";
+import axios from "axios";
 
 function MyCourse() {
-  const { currency, allcourses } = useContext(AppContext);
-  const [courses, setCourses] = useState([]);
+  const { currency, backendUrl, isEducator, getToken } = useContext(AppContext);
+  const [courses, setCourses] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    if (allcourses) {
-      setCourses(allcourses);
-      setLoading(false);
+  const fetchEducatorCourses = async () => {
+    try {
+      const token = await getToken();
+      const { data } = await axios.get(backendUrl + "/api/educator/courses", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      data.success && setCourses(data.courses);
+    } catch (error) {
+      toast.error(error.message);
     }
-  }, [allcourses]);
+  };
+
+  useEffect(() => {
+    if(isEducator){
+    fetchEducatorCourses();
+    }
+  }, [isEducator]);
 
   if (loading) {
     return (
-      <div className="h-screen flex items-center justify-center bg-gray-50">
-        <Loading />
-      </div>
+     <Loading />
     );
   }
 
@@ -64,7 +75,9 @@ function MyCourse() {
                           (course.discount * course.coursePrice) / 100)
                     ).toLocaleString()}
                   </td>
-                  <td className="px-4 py-3">{course.enrolledStudents.length}</td>
+                  <td className="px-4 py-3">
+                    {course.enrolledStudents.length}
+                  </td>
                   <td className="px-4 py-3">
                     {new Date(course.createdAt).toLocaleDateString()}
                   </td>
@@ -103,7 +116,8 @@ function MyCourse() {
                       {course.courseTitle}
                     </span>
                     <span className="text-sm text-gray-500">
-                      Published on {new Date(course.createdAt).toLocaleDateString()}
+                      Published on{" "}
+                      {new Date(course.createdAt).toLocaleDateString()}
                     </span>
                   </div>
                 </div>

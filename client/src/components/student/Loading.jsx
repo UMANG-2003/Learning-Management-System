@@ -1,6 +1,16 @@
-import React from 'react';
-
+import React,{useEffect} from 'react';
+import { useNavigate,useParams } from 'react-router-dom';
 function Loading() {
+  const { path } = useParams();
+const navigate = useNavigate();
+
+useEffect(() => {
+  const timer = setTimeout(() => {
+    navigate(`/${path}`);
+  }, 5000);
+
+  return () => clearTimeout(timer);
+}, []);
   return (
     <div className="flex items-center justify-center h-screen bg-black">
       <div className="relative w-24 h-24">

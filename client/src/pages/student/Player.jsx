@@ -5,33 +5,46 @@ import {
   faAngleDown,
   faPlay,
   faAngleUp,
+  faMarker,
+  faYenSign,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Loading from "../../components/student/Loading";
 import Footer from "../../components/student/Footer";
 import YouTube from "react-youtube";
 import Rating from "../../components/student/Rating";
+import axios from "axios";
 
 function Player() {
-  const { enrolledCourses, calculateChapterTime, humanizeDuration } =
-    useContext(AppContext);
+  const {
+    enrolledCourses,
+    calculateChapterTime,
+    humanizeDuration,
+    backendUrl,
+    getToken,
+    userData,
+    fetchUserEnrolledCourses,
+  } = useContext(AppContext);
   const { courseId } = useParams();
 
   const [course, setCourse] = useState(null);
   const [openSections, setOpenSections] = useState({});
   const [playerData, setPlayerData] = useState(null);
+  const [progressData, setProgressData] = useState(null);
+  const [initialRating, setInitialRating] = useState(0);
 
-  useEffect(() => {
-    const foundCourse = enrolledCourses.find((c) => c._id === courseId);
-    if (foundCourse) {
-      setCourse(foundCourse);
-    }
-  }, [courseId, enrolledCourses]);
-
-  if (!course) {
-    return <Loading />;
-  }
-
+  const getCourseData = () => {
+    enrolledCourses.map((courses) => {
+      if (courses._id === courseId) {
+        setCourse(courses);
+        courses.courseRatings.map((item) => {
+          if (item.userId === userData._id) {
+            setInitialRating(item.rating);
+          }
+        });
+      }
+    });
+  };
   const toggleSection = (index) => {
     setOpenSections((prev) => ({
       ...prev,
@@ -39,7 +52,88 @@ function Player() {
     }));
   };
 
-  return (
+  useEffect(() => {
+    if (enrolledCourses.length > 0) {
+      getCourseData();
+    }
+  }, [enrolledCourses]);
+
+  const markLectureAsCompleted = async (lectureId) => {
+    try {
+      const token = await getToken();
+      const { data } = await axios.post(
+        backendUrl + "/api/user/course-progress",
+        { courseId, lectureId },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (data.success) {
+        toast.success(data.message);
+        getCourseProgress();
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      toast.error(error.message);
+    }
+  };
+
+  const getCourseProgress = async () => {
+    try {
+      const token = await getToken();
+      const { data } = await axios.post(
+        backendUrl + "/api/user/get-course-progress",
+        { courseId },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (data.success) {
+        setProgressData(data.progressData);
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      toast.error(error.message);
+    }
+  };
+
+  const handleRate = async (rating) => {
+    try {
+      const token = await getToken();
+      const { data } = await axios.post(
+        backendUrl + "/api/user/add-rating",
+        { courseId, rating },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (data.success) {
+        toast.success(data.message);
+        fetchUserEnrolledCourses();
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      toast.error(error.message);
+    }
+  };
+
+  useEffect(()=>{
+    getCourseProgress();
+  },[])
+
+  return course ? (
     <>
       <div className="p-4 sm:p-6 lg:p-10 flex flex-col-reverse lg:grid lg:grid-cols-2 gap-8 lg:gap-12 lg:px-36 bg-black text-white">
         {/* Left column */}
@@ -84,7 +178,7 @@ function Player() {
                         className="flex flex-col sm:flex-row items-start sm:items-center gap-2 mb-2 py-2 rounded-lg hover:bg-gray-700 transition-colors cursor-pointer mt-2 sm:mt-3 w-full px-2 sm:px-4"
                       >
                         <FontAwesomeIcon
-                          icon={faPlay}
+                          icon={progressData && progressData.lectureCompleted.includes(lecture.lectureId)?faPlay : faYenSign}
                           className="text-gray-400 mr-2 mt-1"
                         />
                         <div className="flex flex-col sm:flex-row justify-between w-full">
@@ -123,7 +217,7 @@ function Player() {
           </div>
           <div className="flex items-center gap-2 py-3 mt-10">
             <h1 className="text-xl font-bold">Rate this Course</h1>
-            <Rating initialRating={0} />
+            <Rating initialRating={initialRating} onRate={handleRate} />
           </div>
         </div>
 
@@ -141,8 +235,8 @@ function Player() {
                   {playerData.chapter}.{playerData.lecture}{" "}
                   {playerData.lectureTitle}
                 </p>
-                <button className="text-blue-600 text-sm sm:text-base">
-                  {false ? "Completed" : "Mark Completed"}
+                <button onClick={()=>markLectureAsCompleted(playerData.lectureId)} className="text-blue-600 text-sm sm:text-base">
+                  {progressData && progressData.lectureCompleted.includes(playerData.lectureId) ? "Completed" : "Mark Completed"}
                 </button>
               </div>
             </div>
@@ -157,7 +251,7 @@ function Player() {
       </div>
       <Footer />
     </>
-  );
+  ):<Loading />
 }
 
 export default Player;
