@@ -15,17 +15,27 @@ await connectCloudinary()
 
 const allowedOrigins = [
   "http://localhost:5173",
-  "lms-frontend-git-main-umang-2003s-projects.vercel.app"
+  "https://lms-frontend-nu-seven.vercel.app"
 ];
 
 app.use(
   cors({
     origin: (origin, callback) => {
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error("Not allowed by CORS"));
+      // allow requests with no origin (like curl, Postman)
+      if (!origin) return callback(null, true);
+
+      // allow exact matches
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
       }
+
+      // allow all vercel.app preview deployments
+      if (/\.vercel\.app$/.test(new URL(origin).hostname)) {
+        return callback(null, true);
+      }
+
+      // otherwise block
+      return callback(new Error("Not allowed by CORS"));
     },
     credentials: true,
   })
