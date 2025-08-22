@@ -15,7 +15,7 @@ await connectCloudinary()
 
 const allowedOrigins = [
   "http://localhost:5173",
-  "https://lms-frontend-nu-seven.vercel.app"
+  "lms-frontend-git-main-umang-2003s-projects.vercel.app"
 ];
 
 app.use(

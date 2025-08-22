@@ -7,7 +7,9 @@ import axios from "axios";
 import { toast } from "react-toastify";
 
 export const AppContextProvider = (props) => {
+
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
+  
   const currency = import.meta.env.VITE_CURRENCY || "$";
   const [allcourses, setallCourses] = useState([]);
   const [isEducator, setIsEducator] = useState(false);
