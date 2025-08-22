@@ -13,13 +13,19 @@ const app = express()
 await connectDB()
 await connectCloudinary()
 
+const allowedOrigins =
+  process.env.NODE_ENV === "production"
+    ? ["https://lms-frontend-nu-seven.vercel.app"]
+    : ["http://localhost:5173"];
 
 app.use(
   cors({
-    origin: "https://lms-frontend-nu-seven.vercel.app", // your frontend URL
+    origin: allowedOrigins,
     credentials: true,
   })
 );
+
+
 app.use(clerkMiddleware()) 
 
 app.get('/', (req, res) => {
