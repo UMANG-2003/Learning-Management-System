@@ -18,7 +18,7 @@ const Navbar = () => {
   const becomeEducator = async () => {
     try {
       if (isEducator) {
-        navigate("/educator");
+        navigate("/educator/educator");
         return;
       }
       const token = await getToken();

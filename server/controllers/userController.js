@@ -57,7 +57,6 @@ export const purchaseCourse = async (req, res) => {
       ).toFixed(2)
     );
 
-    // Create purchase record in DB
     const newPurchase = await Purchase.create({
       courseId: courseData._id,
       userId,
@@ -79,7 +78,7 @@ export const purchaseCourse = async (req, res) => {
               name: courseData.courseTitle,
               description: courseData.courseDescription || "Course purchase",
             },
-            unit_amount: Math.round(amount * 100), // amount in cents
+            unit_amount: Math.round(amount * 100),
           },
           quantity: 1,
         },
